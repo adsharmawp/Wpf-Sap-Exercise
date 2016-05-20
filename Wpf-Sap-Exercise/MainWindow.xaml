@@ -1,0 +1,102 @@
+﻿<Window x:Class="Wpf_Sap_Exercise.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf_Sap_Exercise.Model"
+        xmlns:localvm="clr-namespace:Wpf_Sap_Exercise.ViewModel"
+        xmlns:localConverters ="clr-namespace:Wpf_Sap_Exercise.Converter"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    <Window.Resources>
+        <localConverters:ColorConverter x:Key="colorConverter" />
+
+        <ControlTemplate x:Key="ErrorTemplate">
+            <DockPanel LastChildFill="True">
+                <Border BorderBrush="Red" BorderThickness="1">
+                    <AdornedElementPlaceholder />
+                </Border>
+            </DockPanel>
+        </ControlTemplate>
+
+        <Style TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Text="{Binding WindowTitle}" HorizontalAlignment="Center" FontWeight="UltraBold" FontSize="20" TextDecorations="Underline" Margin="5" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"  Text="Script Title" FontWeight="Bold" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Text="Script Type" FontWeight="Bold" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Margin="5" Text="Initial Value" FontWeight="Bold" />
+
+            <TextBox Grid.Row="2" Grid.Column="0" Margin="5" MaxLength="4"
+                     Text="{Binding Path=NewScript.ScriptTitle, UpdateSourceTrigger=PropertyChanged, 
+                            ValidatesOnDataErrors=True, NotifyOnValidationError=True}" x:Name="txtTitle" />
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" SelectedItem="{Binding NewScript.ScriptType}">
+                <ComboBox.Items>
+                    <ComboBoxItem IsSelected="True">A</ComboBoxItem>
+                    <ComboBoxItem>B</ComboBoxItem>
+                </ComboBox.Items>
+            </ComboBox>
+            <TextBox Grid.Row="2" Grid.Column="2" Margin="5"
+                     Text="{Binding Path=NewScript.InitialValue, UpdateSourceTrigger=PropertyChanged,
+                            ValidatesOnDataErrors=True, NotifyOnValidationError=True}" x:Name="txtInitialValue" />
+            <Button Grid.Row="2" Grid.Column="3" Margin="5" Command="{Binding AddNewScript}" CommandParameter="{Binding NewScript}" Content="Add">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="IsEnabled" Value="False"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=txtTitle}" Value="False"/>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=txtInitialValue}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="IsEnabled" Value="True"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+        <TextBlock Text="{Binding DuplicateRecordMsg}" Foreground="Red" FontWeight="Bold" />
+        
+        <Grid Margin="5" DataContext="{Binding ScriptList}">
+            <ListView ItemsSource="{Binding}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Script Title" Width="95" DisplayMemberBinding="{Binding ScriptTitle}" />
+                        <GridViewColumn Header="Script Type" Width="94" DisplayMemberBinding="{Binding ScriptType}" />
+                        <GridViewColumn Header="Initial Rate" Width="100" DisplayMemberBinding="{Binding InitialValue}" />
+                        <GridViewColumn Header="Last Rate" Width="100" DisplayMemberBinding="{Binding LastValue}" />
+                        <GridViewColumn Header="Current Rate" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding CurrentValue}" FontWeight="Bold" Foreground="Yellow"
+                                               Background="{Binding CurrentValue, Converter={StaticResource colorConverter}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+    </StackPanel>
+</Window>
