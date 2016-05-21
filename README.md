@@ -35,3 +35,6 @@ Note:
 * Code Quality: class/function/variable naming convntions, package/class structure
 * Choice of data structures
 * Efficiency of code (leverage multi-threading wherever it makes sense)
+
+####Additional Requirements:
+1. Add a button on top of the scereen which will be able to load dynmaically any of 2 view a) Script View b) Type View
